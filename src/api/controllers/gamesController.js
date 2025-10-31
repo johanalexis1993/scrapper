@@ -2,7 +2,7 @@ const Game = require('../models/gamesModel')
 const games = require('../../../games.json')
 const postGames = async (req, res, next) => {
   try {
-    await Game.insertMany(games.results)
+    await Game.insertMany(games)
     return res.status(201).json('All Games added to the database!')
   } catch (error) {
     return res.status(400).json(error)

@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer')
 const fs = require('fs')
 const gameArrays = []
 const write = (gameArrays) =>
-  fs.writeFile('games.json', JSON.stringify(gameArrays), () =>
+  fs.writeFileSync('games.json', JSON.stringify(gameArrays), () =>
     console.log('archivo escrito')
   )
 const repeat = async (page, browser) => {
@@ -35,7 +35,7 @@ const repeat = async (page, browser) => {
     await page.waitForNavigation()
     console.log('pasamos a la suiguiente pagina')
     console.log(`llevamos ${gameArrays.length} datos recolectados`)
-    repeat(page, browser)
+    await repeat(page, browser)
   } catch (error) {
     write(gameArrays)
     await browser.close()
@@ -44,9 +44,34 @@ const repeat = async (page, browser) => {
 const scrapper = async (url) => {
   const browser = await puppeteer.launch({ headless: false })
   const page = await browser.newPage()
-  /*await page.goto(url, { timeout: 60000 }) Aumentamos el tiempo de espera a 60 segundos si necesitaramos mas tiempo*/
-  await page.goto(url)
+  page.setDefaultTimeout(20000)
   await page.setViewport({ width: 1200, height: 1000 })
-  repeat(page, browser)
+  await page.goto(url, { waitUntil: 'domcontentloaded' })
+  await page.evaluate(() => {
+    document
+      .querySelectorAll('.modal, .cookies, [aria-modal="true"]')
+      .forEach((e) => e.remove())
+  })
+  const trends = 'a[href="https://www.instant-gaming.com/es/tendencias/"]'
+  const linkHandle = await page
+    .waitForSelector(trends, { visible: true, timeout: 10000 })
+    .catch(() => null)
+  if (linkHandle) {
+    linkHandle.evaluate((el) => el.scrollIntoView({ block: 'center' }))
+    await page.evaluate(() => {
+      document
+        .querySelectorAll('.modal, .cookies, [aria-modal="true"]')
+        .forEach((e) => e.remove())
+    })
+    await Promise.all([
+      page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 20000 }),
+      linkHandle.click()
+    ])
+  } else {
+    console.warn(
+      'No encontré el enlace de tendencias, sigo en la página actual.'
+    )
+  }
+  await repeat(page, browser)
 }
 module.exports = { scrapper }
