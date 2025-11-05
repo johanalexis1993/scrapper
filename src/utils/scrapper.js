@@ -7,28 +7,23 @@ const write = (gameArrays) =>
   )
 const repeat = async (page, browser) => {
   const arraysDivs = await page.$$('.force-badge')
-  for (const gameDiv of arraysDivs) {
+  let i = 0
+  while (i < arraysDivs.length) {
     let price
+    let gameDiv = arraysDivs[i]
     let title = await gameDiv.$eval('.title', (el) => el.textContent)
     let img = await gameDiv.$eval('img', (el) => el.src)
     try {
       price = await gameDiv.$eval('.price', (el) =>
         parseFloat(el.textContent.slice(0, el.textContent.length - 1))
       )
-      const game = {
-        title,
-        img,
-        price
-      }
+      const game = { title, img, price }
       gameArrays.push(game)
     } catch (error) {
-      const game = {
-        title,
-        img,
-        stock: false
-      }
+      const game = { title, img, stock: false }
       gameArrays.push(game)
     }
+    i++
   }
   try {
     await page.$eval("[title='Next']", (el) => el.click())
