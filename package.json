@@ -8,11 +8,12 @@
     "dev": "nodemon index.js",
     "scrap": "node ./src/utils/scrapperLaucher.js",
     "seed": "node seed.js",
-    "clear": "node clear.js"
+    "dropdb": "node clear.js --drop"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "engines": { "node": ">=18" },
   "dependencies": {
     "dotenv": "^16.4.5",
     "express": "^4.19.1",

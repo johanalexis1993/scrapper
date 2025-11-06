@@ -1,5 +1,6 @@
+const router = require('express').Router()
+const { asyncHandler } = require('../../middleware/asyncHandler')
 const { postGames, getAllGame } = require('../controllers/gamesController')
-const gamesRouter = require('express').Router()
-gamesRouter.post('/getGames', postGames)
-gamesRouter.get('/', getAllGame)
-module.exports = gamesRouter
+router.post('/getGames', asyncHandler(postGames))
+router.get('/', asyncHandler(getAllGame))
+module.exports = router

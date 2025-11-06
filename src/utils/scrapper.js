@@ -1,10 +1,10 @@
 const puppeteer = require('puppeteer')
 const fs = require('fs')
 const gameArrays = []
-const write = (gameArrays) =>
-  fs.writeFileSync('games.json', JSON.stringify(gameArrays), () =>
-    console.log('archivo escrito')
-  )
+const write = (gameArrays) => {
+  fs.writeFileSync('games.json', JSON.stringify(gameArrays, null, 2), 'utf-8')
+  console.log('Archivo escrito correctamente')
+}
 const repeat = async (page, browser) => {
   const arraysDivs = await page.$$('.force-badge')
   let i = 0
@@ -37,7 +37,7 @@ const repeat = async (page, browser) => {
   }
 }
 const scrapper = async (url) => {
-  const browser = await puppeteer.launch({ headless: false })
+  const browser = await puppeteer.launch({ headless: 'new' })
   const page = await browser.newPage()
   page.setDefaultTimeout(20000)
   await page.setViewport({ width: 1200, height: 1000 })
